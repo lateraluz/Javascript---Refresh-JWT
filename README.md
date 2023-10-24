@@ -1,2 +1,2 @@
 # Javascript---Refresh-JWT
-Routine in order to refresh Java Web Token using Javascript.
+In order to refresh JWT Java Web Token using Javascript every "x" seconds
