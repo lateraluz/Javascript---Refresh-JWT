@@ -1,0 +1,109 @@
+<html>
+	<header>
+
+	</header>
+	<body>
+	    <div>
+	     Login  <button onclick = "login()"> Login </button> 
+		</div>
+		<div id="texto"/>
+	</body>
+	
+	
+	 <script>
+		 /*Write By Lateraluz 22-10-2023 9:45 pm
+      Rerfresh Token
+   
+     */ 
+	   
+	   function login() {
+			 
+    			localStorage.removeItem("token"); 
+    			let myBody    = JSON.stringify({ email: "mymail@lateraluzz.com",Password:"Lateraluz*"});
+    			let myHeader  = { 'Content-type': 'application/json; charset=UTF-8' };
+    		 
+    			fetch("https://localhost:5011/api/accounts/Login",{
+    			  method: "POST",
+    			  body: myBody,
+    			  headers: myHeader
+    			})
+    			  .then((response) => {
+    					if (response.ok){
+    						console.log("ok");
+    					}else{
+    						console.log("Error Code Status ="+response.status)
+    					}
+    					
+    					return response.json(); 
+    			  })
+    			  .then((json) => {						 
+    						  console.log("Login "+json);						  
+    						  localStorage.removeItem("token");
+    						  localStorage.setItem("token", json.token);	
+    						  let div = document.getElementById('texto');
+    						  div.innerHTML = 	"Conectado";
+    					   })
+    			.catch(err => {
+    					let div = document.getElementById('texto');
+    					div.innerHTML = "Error "+err;
+    			        console.log("My Error "+err);
+    			 });		   
+	   }
+	   
+	   
+
+	   function refreshToken(){ 
+	   
+    			let fecha = new Date()
+    			if (localStorage.getItem("token") == null){
+    				contador = contador + 1;
+    				console.log("LocalToken doest exist! "+fecha + " Cantidad "+contador.toString());
+    				return;
+    			}
+    	   
+    			let localToken = localStorage.getItem("token");
+    			let myBody    = JSON.stringify({ token: localToken});
+    			let myHeader  = { 'Content-type': 'application/json; charset=UTF-8' };
+    		 
+    			fetch("https://localhost:5011/api/token/refresh2",{
+    			  method: "POST",
+    			  body: myBody,
+    			  headers: myHeader
+    			})
+    			  .then((response) => {
+    					if (response.ok){
+    						console.log("refreshToken Ok");
+    						
+    					}else{						
+    						console.log("Error Code Status ="+response.status)
+    					}
+    					 
+    					return response.json(); 
+    			  })
+    			  .then((json) => {
+    						  console.log("before "+localToken);	
+    						  console.log("now "+json.token);						  
+    						  let div = document.getElementById('texto');						  
+    						  if (json.isAuthSuccessful == true){
+    							  localStorage.removeItem("token");
+    							  localStorage.setItem("token", json.token);								  
+    							  div.innerHTML = 	"Conectado";						  
+    						  }else{
+    							  
+    							  fecha = new Date()
+    							  console.log("Json : "+json.errorMessage);
+    							  div.innerHTML = json.errorMessage+ " " +fecha ;
+    						  }
+    					   })
+    		     .catch(err => 
+    			         console.log("Custome refreshToken error: "+err)
+    			 );			 
+		
+	   }
+	   
+	   let contador = 0;	   
+	   login();
+	   const oTime = setInterval(refreshToken, 15000);	
+	   
+	</script>
+<html>
